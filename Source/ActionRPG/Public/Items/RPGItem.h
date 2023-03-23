@@ -10,6 +10,7 @@
 
 class URPGGameplayAbility;
 
+/** 所有 item 的基类，这个文件夹中的其他头文件是它的子类 */
 /** Base class for all items, do not blueprint directly */
 UCLASS(Abstract, BlueprintType)
 class ACTIONRPG_API URPGItem : public UPrimaryDataAsset

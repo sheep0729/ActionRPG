@@ -7,6 +7,7 @@
 #include "RPGInventoryInterface.h"
 #include "RPGPlayerControllerBase.generated.h"
 
+/** 几乎所有游戏都需要继承 PlayerController ，本项目中主要处理 inventory */
 /** Base class for PlayerController, should be blueprinted */
 UCLASS()
 class ACTIONRPG_API ARPGPlayerControllerBase : public APlayerController, public IRPGInventoryInterface

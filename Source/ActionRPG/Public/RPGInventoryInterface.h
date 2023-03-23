@@ -6,6 +6,11 @@
 #include "RPGInventoryInterface.generated.h"
 
 /**
+ * - 让 RPGCharacterBase 可以不需要 Cast 就能使用 RPGPlayerControllerBase 中 inventory 的相关功能
+ * - 只能在 C++ 中使用
+ */
+
+/**
  * Interface for actors that provide a set of RPGItems bound to ItemSlots
  * This exists so RPGCharacterBase can query inventory without doing hacky player controller casts
  * It is designed only for use by native classes

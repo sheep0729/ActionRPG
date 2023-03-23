@@ -10,6 +10,11 @@ class URPGItem;
 class URPGSaveGame;
 
 /**
+ * - 一个游戏中只有一个，可用于存储全局游戏数据
+ * - 如果定义了它的蓝图子类，需要在项目设置中中修改。
+ */
+
+/**
  * Base class for GameInstance, should be blueprinted
  * Most games will need to make a game-specific subclass of GameInstance
  * Once you make a blueprint subclass of your native subclass you will want to set it to be the default in project settings

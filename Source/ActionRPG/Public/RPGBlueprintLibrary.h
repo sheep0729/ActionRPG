@@ -8,6 +8,10 @@
 #include "RPGBlueprintLibrary.generated.h"
 
 /**
+ * 用来在蓝图中使用的函数
+ */
+
+/**
  * Game-specific blueprint library
  * Most games will need to implement one or more blueprint function libraries to expose their native code to blueprints
  */

@@ -10,6 +10,10 @@
 class URPGGameplayAbility;
 
 /**
+ * 这个文件夹是这个游戏的 GAS
+ */
+
+/**
  * Subclass of ability system component with game-specific data
  * Most games will need to make a game-specific subclass to provide utility functions
  */

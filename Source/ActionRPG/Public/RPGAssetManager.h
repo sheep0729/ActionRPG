@@ -9,6 +9,11 @@
 class URPGItem;
 
 /**
+ * AssetManager 的子类
+ * 需要在 DefaultEngine.ini 中设置 AssetManagerClassName
+ */
+
+/**
  * Game implementation of asset manager, overrides functionality and stores game-specific types
  * It is expected that most games will want to override AssetManager as it provides a good place for game-specific loading logic
  * This is used by setting AssetManagerClassName in DefaultEngine.ini

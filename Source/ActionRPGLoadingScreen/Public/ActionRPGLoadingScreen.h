@@ -5,6 +5,10 @@
 #include "Modules/ModuleInterface.h"
 #include "Modules/ModuleManager.h"
 
+/**
+ * - 在初次加载和地图传送时显示的加载界面，需要在主模块（ActionRPG）加载之前显示，所以是一个单独的模块。
+ * - 很多游戏还会有一个单独的 Editor Module ，用来添加在编辑器中使用的 UI 和工具。
+ */
 /** Module interface for this game's loading screens */
 class IActionRPGLoadingScreenModule : public IModuleInterface
 {

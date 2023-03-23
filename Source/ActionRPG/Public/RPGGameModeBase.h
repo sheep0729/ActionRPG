@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "RPGGameModeBase.generated.h"
 
+/** 本项目的 GameMode 比较简单，因为大部分与地图相关的逻辑都放在蓝图中了 */
+/** 更复杂的项目可能需要在 C++ 中有多个 GameMode */
 /** Base class for GameMode, should be blueprinted */
 UCLASS()
 class ACTIONRPG_API ARPGGameModeBase : public AGameModeBase

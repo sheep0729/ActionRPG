@@ -7,7 +7,8 @@
 #include "GameFramework/SaveGame.h"
 #include "RPGSaveGame.generated.h"
 
-/** List of versions, native code will handle fixups for any old versions */
+/** ±£¥Ê”Œœ∑ */
+/** List of versions, native code will handle fix-ups for any old versions */
 namespace ERPGSaveGameVersion
 {
 	enum type

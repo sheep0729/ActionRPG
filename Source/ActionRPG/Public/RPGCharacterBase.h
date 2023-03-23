@@ -15,9 +15,10 @@
 class URPGGameplayAbility;
 class UGameplayEffect;
 
+/** 更复杂的游戏可能需要多个 C++ 角色类 */
 /** Base class for Character, Designed to be blueprinted */
-/** 继承 IAbilitySystemInterface 接口，只有一个获取 ASC 的函数： GetAbilitySystemComponent() */
 UCLASS()
+/** 继承 IAbilitySystemInterface 接口，只有一个获取 ASC 的函数： GetAbilitySystemComponent() */
 class ACTIONRPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
@@ -96,7 +97,7 @@ protected:
 	UPROPERTY(EditAnywhere, Replicated, Category = Abilities)
 	int32 CharacterLevel;
 
-	/** 在创建角色时授予角色的能力 */
+	/** 在创建角色时授予角色的能力，实际上没有使用 */
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<URPGGameplayAbility>> GameplayAbilities;
