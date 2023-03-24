@@ -19,10 +19,12 @@ public:
 	ARPGPlayerControllerBase() {}
 	virtual void BeginPlay() override;
 
+	/** 从 item 定义到 item 数据的映射，保存 player 拥有的全部 item */
 	/** Map of all items owned by this player, from definition to data */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<URPGItem*, FRPGItemData> InventoryData;
 
+	/** 从 ItemSlot 到 Item 定义的映射 */
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, URPGItem*> SlottedItems;

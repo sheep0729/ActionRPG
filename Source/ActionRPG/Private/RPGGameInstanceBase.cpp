@@ -19,7 +19,7 @@ void URPGGameInstanceBase::AddDefaultInventory(URPGSaveGame* SaveGame, bool bRem
 		SaveGame->InventoryData.Reset();
 	}
 
-	// Now add the default inventory, this only adds if not already in hte inventory
+	// Now add the default inventory, this only adds if not already in the default inventory
 	for (const TPair<FPrimaryAssetId, FRPGItemData>& Pair : DefaultInventory)
 	{
 		if (!SaveGame->InventoryData.Contains(Pair.Key))

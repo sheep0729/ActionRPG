@@ -11,7 +11,7 @@ class URPGSaveGame;
 
 /**
  * - 一个游戏中只有一个，可用于存储全局游戏数据
- * - 如果定义了它的蓝图子类，需要在项目设置中中修改。
+ * - 如果定义了它的蓝图子类，需要在项目设置中修改。
  */
 
 /**
@@ -32,6 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FPrimaryAssetId, FRPGItemData> DefaultInventory;
 
+	/** 每个类型的 item 的 slot 的数量 */
 	/** Number of slots for each type of item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
@@ -48,13 +49,17 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnSaveGameLoaded OnSaveGameLoaded;
 
+	/** 原生代理，加载 / 重置了保存的游戏 */
 	/** Native delegate for save game load/reset */
 	FOnSaveGameLoadedNative OnSaveGameLoadedNative;
 
 	/**
-	 * Adds the default inventory to the inventory array
-	 * @param InventoryArray Inventory to modify
-	 * @param RemoveExtra If true, remove anything other than default inventory
+	 * 把加载的 SaveGame 添加到 DefaultInventory 中
+	 */
+	/**
+	 * Adds the SaveGame to the default inventory
+	 * @param SaveGame
+	 * @param bRemoveExtra If true, remove anything other than default inventory
 	 */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	void AddDefaultInventory(URPGSaveGame* SaveGame, bool bRemoveExtra = false);

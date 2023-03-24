@@ -53,6 +53,7 @@ public:
 	FString UserId;
 
 protected:
+	/** 这个没有用到 */
 	/** Deprecated way of storing items, this is read in but not saved out */
 	UPROPERTY()
 	TArray<FPrimaryAssetId> InventoryItems_DEPRECATED;

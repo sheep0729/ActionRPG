@@ -39,7 +39,8 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 	
 	check(AbilitySystemComponent);
-	
+
+	// 判断在服务器上
 	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
 	{
 		// Grant abilities, but only on the server	
@@ -249,6 +250,9 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 		// Initialize our abilities
 		if (AbilitySystemComponent)
 		{
+			// 设置 ACS 的 Actor
+			// OwnerActor ：逻辑上拥有这个 ASC ，可以是 PlayerState
+			// AvatarActor ：ASC 作用于这个 Actor ，一般是 Pawn
 			AbilitySystemComponent->InitAbilityActorInfo(this, this);
 			AddStartupGameplayAbilities();
 		}
