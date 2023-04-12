@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "RPGPlayerControllerBase.h"
 #include "RPGCharacterBase.h"
@@ -218,7 +218,8 @@ void ARPGPlayerControllerBase::FillEmptySlots()
 
 bool ARPGPlayerControllerBase::SaveInventory()
 {
-	UWorld* World = GetWorld();
+	// 获得 World 和 GameInstance
+    const UWorld* World = GetWorld();
 	URPGGameInstanceBase* GameInstance = World ? World->GetGameInstance<URPGGameInstanceBase>() : nullptr;
 
 	if (!GameInstance)

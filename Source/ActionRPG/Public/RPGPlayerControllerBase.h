@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "RPGInventoryInterface.h"
 #include "RPGPlayerControllerBase.generated.h"
 
-/** ¼¸ºõËùÓĞÓÎÏ·¶¼ĞèÒª¼Ì³Ğ PlayerController £¬±¾ÏîÄ¿ÖĞÖ÷Òª´¦Àí inventory */
+/** å‡ ä¹æ‰€æœ‰æ¸¸æˆéƒ½éœ€è¦ç»§æ‰¿ PlayerController ï¼Œæœ¬é¡¹ç›®ä¸­ä¸»è¦å¤„ç† inventory */
 /** Base class for PlayerController, should be blueprinted */
 UCLASS()
 class ACTIONRPG_API ARPGPlayerControllerBase : public APlayerController, public IRPGInventoryInterface
@@ -19,13 +19,11 @@ public:
 	ARPGPlayerControllerBase() {}
 	virtual void BeginPlay() override;
 
-	/** ´Ó item ¶¨Òåµ½ item Êı¾İµÄÓ³Éä£¬±£´æ player ÓµÓĞµÄÈ«²¿ item */
-	/** Map of all items owned by this player, from definition to data */
+	/** ä» item å®šä¹‰åˆ° item æ•°æ®çš„æ˜ å°„ï¼Œä¿å­˜ player æ‹¥æœ‰çš„å…¨éƒ¨ item ã€‚ Map of all items owned by this player, from definition to data */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<URPGItem*, FRPGItemData> InventoryData;
 
-	/** ´Ó ItemSlot µ½ Item ¶¨ÒåµÄÓ³Éä */
-	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
+	/** ä» ItemSlot åˆ° Item å®šä¹‰çš„æ˜ å°„ã€‚ Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, URPGItem*> SlottedItems;
 

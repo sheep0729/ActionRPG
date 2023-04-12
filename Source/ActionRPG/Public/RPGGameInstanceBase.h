@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -10,8 +10,8 @@ class URPGItem;
 class URPGSaveGame;
 
 /**
- * - Ò»¸öÓÎÏ·ÖĞÖ»ÓĞÒ»¸ö£¬¿ÉÓÃÓÚ´æ´¢È«¾ÖÓÎÏ·Êı¾İ
- * - Èç¹û¶¨ÒåÁËËüµÄÀ¶Í¼×ÓÀà£¬ĞèÒªÔÚÏîÄ¿ÉèÖÃÖĞĞŞ¸Ä¡£
+ * - ä¸€ä¸ªæ¸¸æˆä¸­åªæœ‰ä¸€ä¸ªï¼Œå¯ç”¨äºå­˜å‚¨å…¨å±€æ¸¸æˆæ•°æ®
+ * - å¦‚æœå®šä¹‰äº†å®ƒçš„è“å›¾å­ç±»ï¼Œéœ€è¦åœ¨é¡¹ç›®è®¾ç½®ä¸­ä¿®æ”¹ã€‚
  */
 
 /**
@@ -28,11 +28,12 @@ public:
 	// Constructor
 	URPGGameInstanceBase();
 
+	/** ç©å®¶é»˜è®¤çš„ç‰©å“ */
 	/** List of inventory items to add to new players */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FPrimaryAssetId, FRPGItemData> DefaultInventory;
 
-	/** Ã¿¸öÀàĞÍµÄ item µÄ slot µÄÊıÁ¿ */
+	/** æ¯ä¸ªç±»å‹çš„ item çš„ slot çš„æ•°é‡ */
 	/** Number of slots for each type of item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
@@ -49,14 +50,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnSaveGameLoaded OnSaveGameLoaded;
 
-	/** Ô­Éú´úÀí£¬¼ÓÔØ / ÖØÖÃÁË±£´æµÄÓÎÏ· */
+	/** åŸç”Ÿä»£ç†ï¼ŒåŠ è½½ / é‡ç½®äº†ä¿å­˜çš„æ¸¸æˆ */
 	/** Native delegate for save game load/reset */
 	FOnSaveGameLoadedNative OnSaveGameLoadedNative;
 
 	/**
-	 * °Ñ¼ÓÔØµÄ SaveGame Ìí¼Óµ½ DefaultInventory ÖĞ
-	 */
-	/**
+	 * æŠŠåŠ è½½çš„ SaveGame æ·»åŠ åˆ° DefaultInventory ä¸­ã€‚
+	 *
 	 * Adds the SaveGame to the default inventory
 	 * @param SaveGame
 	 * @param bRemoveExtra If true, remove anything other than default inventory
@@ -68,7 +68,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool IsValidItemSlot(FRPGItemSlot ItemSlot) const;
 
-	/** Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
+	/** è¿”å›å½“å‰ä¿å­˜çš„æ¸¸æˆï¼Œæ‰€ä»¥å¯ä»¥è¢«ç”¨æ¥åˆå§‹åŒ–çŠ¶æ€ã€‚ç›´åˆ° WriteSaveGame è¢«è°ƒç”¨ï¼Œæ”¹å˜æ‰ä¼šå†™å…¥ã€‚ Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
 	UFUNCTION(BlueprintCallable, Category = Save)
 	URPGSaveGame* GetCurrentSaveGame();
 
@@ -88,7 +88,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Save)
 	void GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const;
 
-	/** Writes the current save game object to disk. The save to disk happens in a background thread*/
+	/** æŠŠå½“å‰ä¿å­˜çš„æ¸¸æˆå†™å…¥ç¡¬ç›˜ï¼Œåœ¨åå°çº¿ç¨‹ä¸­è¿›è¡Œã€‚ Writes the current save game object to disk. The save to disk happens in a background thread*/
 	UFUNCTION(BlueprintCallable, Category = Save)
 	bool WriteSaveGame();
 
