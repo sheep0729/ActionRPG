@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ActionRPG.h"
 
@@ -7,5 +7,5 @@ IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, ActionRPG, "UES_ActionRPG
 /** Logging definitions */
 DEFINE_LOG_CATEGORY(LogActionRPG);
 
-// ÔÚ ActionRPG.h ÖĞÉùÃ÷µÄ STAT ĞèÒªÔÚÔ´ÎÄ¼şÖĞ¶¨Òå
+// åœ¨ ActionRPG.h ä¸­å£°æ˜çš„ STAT éœ€è¦åœ¨æºæ–‡ä»¶ä¸­å®šä¹‰
 DEFINE_STAT(STAT_HandleHealthChanged);

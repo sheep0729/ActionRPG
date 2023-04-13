@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "RPGCharacterBase.h"
 #include "Items/RPGItem.h"
@@ -12,10 +12,12 @@ ARPGCharacterBase::ARPGCharacterBase()
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	// Create ability system component, and set it to be explicitly replicated
-	// Õâ¸ö URPGAbilitySystemComponent ÊÇ¼Ì³Ğ×Ô UAbilitySystemComponent µÄ×ÓÀà
-	AbilitySystemComponent = CreateDefaultSubobject<URPGAbilitySystemComponent>(TEXT("AbilitySystemComponent")); // ´´½¨ ASC
+	// è¿™ä¸ª URPGAbilitySystemComponent æ˜¯ç»§æ‰¿è‡ª UAbilitySystemComponent çš„å­ç±»
+	AbilitySystemComponent = CreateDefaultSubobject<URPGAbilitySystemComponent>(TEXT("AbilitySystemComponent")); // åˆ›å»º ASC
 	AbilitySystemComponent->SetIsReplicated(true); // 
 
+	// ç›´æ¥å°† AttributeSet ä½œä¸ºæ‹¥æœ‰ Ability System Component çš„ Actor çš„ subobject ã€‚
+	// ä¹Ÿå¯ä»¥é€šè¿‡ GetOrCreateAttributeSubobject æ–¹æ³•ä¼ é€’ç»™ Ability System Component ã€‚
 	// Create the attribute set, this replicates by default
 	AttributeSet = CreateDefaultSubobject<URPGAttributeSet>(TEXT("AttributeSet"));
 
@@ -40,7 +42,7 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 	
 	check(AbilitySystemComponent);
 
-	// ÅĞ¶ÏÔÚ·şÎñÆ÷ÉÏ
+	// åˆ¤æ–­åœ¨æœåŠ¡å™¨ä¸Š
 	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
 	{
 		// Grant abilities, but only on the server	
@@ -250,9 +252,9 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 		// Initialize our abilities
 		if (AbilitySystemComponent)
 		{
-			// ÉèÖÃ ACS µÄ Actor
-			// OwnerActor £ºÂß¼­ÉÏÓµÓĞÕâ¸ö ASC £¬¿ÉÒÔÊÇ PlayerState
-			// AvatarActor £ºASC ×÷ÓÃÓÚÕâ¸ö Actor £¬Ò»°ãÊÇ Pawn
+			// è®¾ç½® ACS çš„ Actor
+			// OwnerActor ï¼šé€»è¾‘ä¸Šæ‹¥æœ‰è¿™ä¸ª ASC ï¼Œå¯ä»¥æ˜¯ PlayerState
+			// AvatarActor ï¼šASC ä½œç”¨äºè¿™ä¸ª Actor ï¼Œä¸€èˆ¬æ˜¯ Pawn
 			AbilitySystemComponent->InitAbilityActorInfo(this, this);
 			AddStartupGameplayAbilities();
 		}

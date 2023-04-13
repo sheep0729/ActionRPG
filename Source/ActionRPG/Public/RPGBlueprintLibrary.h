@@ -9,7 +9,7 @@
 
 /**
  * 用来在蓝图中使用的函数
- * 不与特定 Actor 挂钩
+ * 不与特定 Actor 相关
  */
 
 /**
@@ -62,8 +62,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	static TArray<FActiveGameplayEffectHandle> ApplyExternalEffectContainerSpec(const FRPGGameplayEffectContainerSpec& ContainerSpec);
 
-	//Returns the project version set in the 'Project Settings' > 'Description' section of the editor
-	// 返回在编辑器的 Project Settings > Description 中设置的 project version 。
+	/** 返回在编辑器的 Project Settings > Description 中设置的 project version 。 */
+	/** Returns the project version set in the 'Project Settings' > 'Description' section of the editor */
 	UFUNCTION(BlueprintPure, Category = "Project")
 	static FString GetProjectVersion();
 };
