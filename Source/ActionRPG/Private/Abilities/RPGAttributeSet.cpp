@@ -75,6 +75,7 @@ void URPGAttributeSet::AdjustAttributeForMaxChange(const FGameplayAttributeData&
 	{
 		// Change current value to maintain the current Val / Max percent
 		const float CurrentValue = AffectedAttribute.GetCurrentValue();
+		// 如果 CurrentMaxValue == 0 ，说明是在创建 Character 时设置的初始属性，直接设置为 NewMaxValue 就好，不用按照比例调整了（比如初始应该是满血）。
 		const float NewDelta = (CurrentMaxValue > 0.f) ? (CurrentValue * NewMaxValue / CurrentMaxValue) - CurrentValue : NewMaxValue;
 
 		// 不使用 GE ，直接改变属性的值。所以也不会调用下面的 Pre / Post 方法，不会检查 tag 和应用条件，没有  predict / roll back 功能。

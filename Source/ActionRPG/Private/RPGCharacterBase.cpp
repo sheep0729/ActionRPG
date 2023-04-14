@@ -31,35 +31,51 @@ UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 }
 
 /*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-DECLARE_CYCLE_STAT(TEXT("AddStartupGameplayAbilities"), STAT_AddStartupGameplayAbilities, STATGROUP_ARPGCharacterBase);
+// DECLARE_CYCLE_STAT(TEXT("AddStartupGameplayAbilities"), STAT_AddStartupGameplayAbilities, STATGROUP_ARPGCharacterBase);
 /*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
+/**
+ * @brief 在创建 Character 或时
+ */
 void ARPGCharacterBase::AddStartupGameplayAbilities()
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	SCOPE_CYCLE_COUNTER(STAT_AddStartupGameplayAbilities);
+	// SCOPE_CYCLE_COUNTER(STAT_AddStartupGameplayAbilities);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 	
 	check(AbilitySystemComponent);
 
-	// 判断在服务器上
+	// 在服务器上且没有初始化
 	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
 	{
 		// Grant abilities, but only on the server	
 		for (TSubclassOf<URPGGameplayAbility>& StartupAbility : GameplayAbilities)
 		{
+			// FGameplayAbilitySpec 是一个可激活的 Ability 的 spec 。
+			// 它内部有一个 Ability 的 CDO ，和这个 Ability 的所有实例。
+			// 激活的 / 实例化的 Ability 还需要其他的信息， FGameplayAbilitySpec 也保存了这些信息。
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, GetCharacterLevel(), INDEX_NONE, this));
 		}
 
 		// Now apply passives
 		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
 		{
+			// 创建一个 GameplayEffectContext 并返回 Handle 。
+			// GameplayEffectContext 是 GE 在执行期间的上下文。
 			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-			EffectContext.AddSourceObject(this);
-
+			// 在 GE 的 Context 中设置这个 GE 是哪个 Actor 创建的，在这里是自己。
+			EffectContext.AddSourceObject(this); 
+			// 创建一个 FGameplayEffectSpec 并返回 Handle 。
+			// FGameplayEffectSpec 是准备好被应用的 GE ，创建它需要
+			//   GE 本身（需要它的 CDO）
+			//   等级信息
+			//   GE 的上下文
 			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
 			if (NewHandle.IsValid())
 			{
+				// ApplyGameplayEffectSpecToTarget 最终会调用 ActiveGameplayEffects.ApplyGameplayEffectSpec()
+				// ActiveGameplayEffects 是 AbilitySystemComponent 上的一个 FActiveGameplayEffectsContainer ，它是 FActiveGameplayEffect 的容器。
+				// 返回的 FActiveGameplayEffectHandle 和上面的 Handle 不一样，它不是一个简单的 Wrapper ，而是用来在 Container 外部访问特定的 FActiveGameplayEffect 的。 
 				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
 			}
 		}
@@ -73,7 +89,7 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 void ARPGCharacterBase::RemoveStartupGameplayAbilities()
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("RemoveStartupGameplayAbilities"), STAT_RemoveStartupGameplayAbilities, STATGROUP_ARPGCharacterBase);
+	// DECLARE_SCOPE_CYCLE_COUNTER(TEXT("RemoveStartupGameplayAbilities"), STAT_RemoveStartupGameplayAbilities, STATGROUP_ARPGCharacterBase);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	check(AbilitySystemComponent);
@@ -124,6 +140,7 @@ void ARPGCharacterBase::RefreshSlottedGameplayAbilities()
 
 void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs)
 {
+	// 先获取默认装备的能力
 	// First add default ones
 	for (const TPair<FRPGItemSlot, TSubclassOf<URPGGameplayAbility>>& DefaultPair : DefaultSlottedAbilities)
 	{
@@ -133,6 +150,7 @@ void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbil
 		}
 	}
 
+	// 再添加从 inventory 中的道具中获得的能力
 	// Now potentially override with inventory
 	if (InventorySource)
 	{
@@ -161,13 +179,13 @@ void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbil
 }
 
 /*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-DECLARE_CYCLE_STAT(TEXT("AddSlottedGameplayAbilities"), STAT_AddSlottedGameplayAbilities, STATGROUP_ARPGCharacterBase);
+// DECLARE_CYCLE_STAT(TEXT("AddSlottedGameplayAbilities"), STAT_AddSlottedGameplayAbilities, STATGROUP_ARPGCharacterBase);
 /*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 void ARPGCharacterBase::AddSlottedGameplayAbilities()
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	const uint32 BeginTime = FPlatformTime::Cycles();
+	// const uint32 BeginTime = FPlatformTime::Cycles();
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	TMap<FRPGItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
@@ -185,8 +203,8 @@ void ARPGCharacterBase::AddSlottedGameplayAbilities()
 	}
 
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	const uint32 EndTime = FPlatformTime::Cycles();
-	SET_CYCLE_COUNTER(STAT_AddSlottedGameplayAbilities, BeginTime - EndTime);
+	// const uint32 EndTime = FPlatformTime::Cycles();
+	// SET_CYCLE_COUNTER(STAT_AddSlottedGameplayAbilities, BeginTime - EndTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 }
 
@@ -233,9 +251,9 @@ void ARPGCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 void ARPGCharacterBase::PossessedBy(AController* NewController)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	double ThisTime = 0;
-	{
-		SCOPE_SECONDS_COUNTER(ThisTime);
+	// double ThisTime = 0;
+	// {
+	// 	SCOPE_SECONDS_COUNTER(ThisTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 		Super::PossessedBy(NewController);
@@ -259,8 +277,8 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 			AddStartupGameplayAbilities();
 		}
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	}
-	UE_LOG(LogTemp, Log, TEXT("ARPGCharacterBase::PossessedBy %.2f"), ThisTime);
+	// }
+	// UE_LOG(LogTemp, Log, TEXT("ARPGCharacterBase::PossessedBy %.2f"), ThisTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 }
 
@@ -347,7 +365,7 @@ bool ARPGCharacterBase::SetCharacterLevel(int32 NewLevel)
 bool ARPGCharacterBase::ActivateAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	SCOPE_LOG_TIME_FUNC();
+	// SCOPE_LOG_TIME_FUNC();
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
@@ -363,8 +381,8 @@ bool ARPGCharacterBase::ActivateAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, boo
 void ARPGCharacterBase::GetActiveAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, TArray<URPGGameplayAbility*>& ActiveAbilities)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	static FTotalTimeAndCount GetActiveAbilitiesWithItemSlotTime;
-	SCOPE_LOG_TIME_FUNC_WITH_GLOBAL(&GetActiveAbilitiesWithItemSlotTime);
+	// static FTotalTimeAndCount GetActiveAbilitiesWithItemSlotTime;
+	// SCOPE_LOG_TIME_FUNC_WITH_GLOBAL(&GetActiveAbilitiesWithItemSlotTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
@@ -407,8 +425,8 @@ void ARPGCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer Ability
 bool ARPGCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	static FTotalTimeAndCount GetCooldownRemainingForTagTime;
-	SCOPE_LOG_TIME("ARPGCharacterBase::GetCooldownRemainingForTag", &GetCooldownRemainingForTagTime);
+	// static FTotalTimeAndCount GetCooldownRemainingForTagTime;
+	// SCOPE_LOG_TIME("ARPGCharacterBase::GetCooldownRemainingForTag", &GetCooldownRemainingForTagTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 	if (AbilitySystemComponent && CooldownTags.Num() > 0)
@@ -451,7 +469,7 @@ void ARPGCharacterBase::HandleHealthChanged(float DeltaValue, const struct FGame
 	if (bAbilitiesInitialized)
 	{
 		/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-		INC_DWORD_STAT(STAT_HandleHealthChanged)
+		// INC_DWORD_STAT(STAT_HandleHealthChanged)
 		/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 		OnHealthChanged(DeltaValue, EventTags);

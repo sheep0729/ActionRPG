@@ -97,15 +97,21 @@ protected:
 	UPROPERTY(EditAnywhere, Replicated, Category = Abilities)
 	int32 CharacterLevel;
 
-	/** 在创建角色时授予角色的能力，实际上没有使用 */
+	/** 在创建 Character 时赋予的 Ability */
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<URPGGameplayAbility>> GameplayAbilities;
 
+	/** 在创建 Character 时放到道具槽中的 Ability */
 	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<FRPGItemSlot, TSubclassOf<URPGGameplayAbility>> DefaultSlottedAbilities;
 
+	/** 用来设置 Character 的初始属性的 GE 会在 Character 创建和 Character 的等级改变时应用（AddStartupGameplayAbilities()），
+	 * BP_PlayerCharacter 中添加的 GE 是 GE_PlayerStats
+	 * NPC_GoblinBP 中添加的 GE 是 GE_GoblinStats
+	 * NPC_SpiderBoss 中添加的 GE 是 GE_SpiderStats
+	 * 他们使用的数据保存在 StartingStats 中 */
 	/** Passive gameplay effects applied on creation */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
@@ -118,6 +124,7 @@ protected:
 	UPROPERTY()
 	URPGAttributeSet* AttributeSet;
 
+	/** 一个指向 inventory 源的指针，可能是 null */
 	/** Cached pointer to the inventory source for this character, can be null */
 	UPROPERTY()
 	TScriptInterface<IRPGInventoryInterface> InventorySource;
@@ -187,6 +194,7 @@ protected:
 	/** Adds slotted item abilities if needed */
 	void AddSlottedGameplayAbilities();
 
+	/** 获取来自装备的 Ability ，放到 SlottedAbilitySpecs 中 */
 	/** Fills in with ability specs, based on defaults and inventory */
 	void FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs);
 

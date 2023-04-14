@@ -7,6 +7,10 @@
 #include "Abilities/RPGAbilityTypes.h"
 #include "RPGGameplayAbility.generated.h"
 
+
+/**
+ * 
+ */
 /**
  * Subclass of ability blueprint type with game-specific data
  * This class uses GameplayEffectContainers to allow easier execution of gameplay effects based on a triggering tag

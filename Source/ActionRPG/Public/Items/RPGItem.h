@@ -10,7 +10,7 @@
 
 class URPGGameplayAbility;
 
-/** ËùÓĞ item µÄ»ùÀà£¬Õâ¸öÎÄ¼ş¼ĞÖĞµÄÆäËûÍ·ÎÄ¼şÊÇËüµÄ×ÓÀà */
+/** æ‰€æœ‰ item çš„åŸºç±»ï¼Œè¿™ä¸ªæ–‡ä»¶å¤¹ä¸­çš„å…¶ä»–å¤´æ–‡ä»¶æ˜¯å®ƒçš„å­ç±» */
 /** Base class for all items, do not blueprint directly */
 UCLASS(Abstract, BlueprintType)
 class ACTIONRPG_API URPGItem : public UPrimaryDataAsset
@@ -58,6 +58,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxLevel;
 
+	/** å½“è¿™ä¸ªç‰©å“è¢«è£…å¤‡åèµ‹äºˆç»™è§’è‰²çš„ Ability */
 	/** Ability to grant if this item is slotted */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TSubclassOf<URPGGameplayAbility> GrantedAbility;
