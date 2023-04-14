@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -15,10 +15,10 @@
 class URPGGameplayAbility;
 class UGameplayEffect;
 
-/** ¸ü¸´ÔÓµÄÓÎÏ·¿ÉÄÜĞèÒª¶à¸ö C++ ½ÇÉ«Àà */
+/** æ›´å¤æ‚çš„æ¸¸æˆå¯èƒ½éœ€è¦å¤šä¸ª C++ è§’è‰²ç±» */
 /** Base class for Character, Designed to be blueprinted */
 UCLASS()
-/** ¼Ì³Ğ IAbilitySystemInterface ½Ó¿Ú£¬Ö»ÓĞÒ»¸ö»ñÈ¡ ASC µÄº¯Êı£º GetAbilitySystemComponent() */
+/** ç»§æ‰¿ IAbilitySystemInterface æ¥å£ï¼Œåªæœ‰ä¸€ä¸ªè·å– ASC çš„å‡½æ•°ï¼š GetAbilitySystemComponent() */
 class ACTIONRPG_API ARPGCharacterBase : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
@@ -31,10 +31,10 @@ public:
 	virtual void OnRep_Controller() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	// ÊµÏÖ IAbilitySystemInterface
+	// å®ç° IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	/*------------------------------------------------------ ÊôĞÔ Getter ---------------------------------------------------*/
+	/*------------------------------------------------------ å±æ€§ Getter ---------------------------------------------------*/
 
 	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
@@ -97,7 +97,7 @@ protected:
 	UPROPERTY(EditAnywhere, Replicated, Category = Abilities)
 	int32 CharacterLevel;
 
-	/** ÔÚ´´½¨½ÇÉ«Ê±ÊÚÓè½ÇÉ«µÄÄÜÁ¦£¬Êµ¼ÊÉÏÃ»ÓĞÊ¹ÓÃ */
+	/** åœ¨åˆ›å»ºè§’è‰²æ—¶æˆäºˆè§’è‰²çš„èƒ½åŠ›ï¼Œå®é™…ä¸Šæ²¡æœ‰ä½¿ç”¨ */
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<URPGGameplayAbility>> GameplayAbilities;
@@ -110,7 +110,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
-	/** AS ×é¼ş The component used to handle ability system interactions */
+	/** AS ç»„ä»¶ The component used to handle ability system interactions */
 	UPROPERTY()
 	URPGAbilitySystemComponent* AbilitySystemComponent;
 
