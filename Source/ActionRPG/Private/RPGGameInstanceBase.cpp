@@ -13,13 +13,15 @@ URPGGameInstanceBase::URPGGameInstanceBase()
 
 void URPGGameInstanceBase::AddDefaultInventory(URPGSaveGame* SaveGame, bool bRemoveExtra)
 {
+	// 相当于把 inventory 重置为 default inventory
 	// If we want to remove extra, clear out the existing inventory
 	if (bRemoveExtra)
 	{
 		SaveGame->InventoryData.Reset();
 	}
 
-	// Now add the default inventory, this only adds if not already in the default inventory
+	// 如果不设置 bRemoveExtra ，相当于把 default inventory 补充到 inventory 中
+	// Now add the default inventory, this only adds if not already in the inventory
 	for (const TPair<FPrimaryAssetId, FRPGItemData>& Pair : DefaultInventory)
 	{
 		if (!SaveGame->InventoryData.Contains(Pair.Key))
@@ -37,6 +39,7 @@ bool URPGGameInstanceBase::IsValidItemSlot(FRPGItemSlot ItemSlot) const
 
 		if (FoundCount)
 		{
+			// TODO 这里为什么是小于？
 			return ItemSlot.SlotNumber < *FoundCount;
 		}
 	}
@@ -69,23 +72,27 @@ bool URPGGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 {
 	bool bLoaded = false;
 
+	// 如果没有启用保存到硬盘，就创建新的存档
 	if (!bSavingEnabled)
 	{
 		// If saving is disabled, ignore passed in object
 		SaveGameObject = nullptr;
 	}
 
+	// 替换当前的存档
 	// Replace current save, old object will GC out
 	CurrentSaveGame = Cast<URPGSaveGame>(SaveGameObject);
 
 	if (CurrentSaveGame)
 	{
+		// 保证存档中包含 default inventory
 		// Make sure it has any newly added default inventory
 		AddDefaultInventory(CurrentSaveGame, false);
 		bLoaded = true;
 	}
 	else
 	{
+		// 没有加载到存档，创建了一个新的
 		// This creates it on demand
 		CurrentSaveGame = Cast<URPGSaveGame>(UGameplayStatics::CreateSaveGameObject(URPGSaveGame::StaticClass()));
 
@@ -110,22 +117,22 @@ bool URPGGameInstanceBase::WriteSaveGame()
 	{
 		if (bCurrentlySaving) // 检查当前是否在保存
 		{
-			// Schedule another save to happen after current one finishes. We only queue one save
 			// 在当前保存操作结束后再处理，这里直接返回，用一个变量记录，相当于等待保存的队列长度为 1 。
+			// Schedule another save to happen after current one finishes. We only queue one save
 			bPendingSaveRequested = true;
 			return true;
 		}
 
-		// Indicate that we're currently doing an async save
 		// 表明正在执行一个异步的保存操作
+		// Indicate that we're currently doing an async save
 		bCurrentlySaving = true;
 
-		// This goes off in the background
 		// 安排一个异步的保存操作，这里的 Slot 是一个字符串，相当于 Key 。
 		// 这个函数也有蓝图的版本。
 		// 在游戏线程上序列化，在平台相关的工作线程上进行实际的写入操作。
 		// 完成时会在游戏线程上调用委托
 		// 传入的委托会被拷贝到工作线程，所以要保证 Payload 在 copy by value 时是线程安全的（这里没有 Payload）。
+		// This goes off in the background
 		UGameplayStatics::AsyncSaveGameToSlot(GetCurrentSaveGame(), SaveSlot, SaveUserIndex, FAsyncSaveGameToSlotDelegate::CreateUObject(this, &URPGGameInstanceBase::HandleAsyncSave));
 		return true;
 	}
@@ -134,6 +141,7 @@ bool URPGGameInstanceBase::WriteSaveGame()
 
 void URPGGameInstanceBase::ResetSaveGame()
 {
+	// 给 HandleSaveGameLoaded 传入一个 nullptr ，它就会创建一个新的存档
 	// Call handle function with no loaded save, this will reset the data
 	HandleSaveGameLoaded(nullptr);
 }
