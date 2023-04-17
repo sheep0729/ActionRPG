@@ -26,34 +26,42 @@ public:
 		, AbilityLevel(1)
 	{}
 
+	/** 道具的类型，在 C++ 的子类中设置，这个类型是在 URPGAssetManager 中定义的 */
 	/** Type of this item, set in native parent class */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 	FPrimaryAssetType ItemType;
 
+	/** 用户可见的道具名称 */
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FText ItemName;
 
+	/** 用户可见的描述 */
 	/** User-visible long description */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FText ItemDescription;
 
+	/** 道具的图标 */
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FSlateBrush ItemIcon;
 
+	/** 游戏中的价格 */
 	/** Price in game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	int32 Price;
 
+	/** 可以在背包中保存的最大数量，0 代表无限 */
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxCount;
 
+	/** 返回道具是否是可消耗的，即 MaxCount <= 0 */
 	/** Returns if the item is consumable (MaxCount <= 0)*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Max)
 	bool IsConsumable() const;
 
+	/** 道具的最大等级，0 代表无限 */
 	/** Maximum level this item can be, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxLevel;
@@ -63,14 +71,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TSubclassOf<URPGGameplayAbility> GrantedAbility;
 
+	/** 能力的等级， <= 0 代表使用角色的等级 */
 	/** Ability level this item grants. <= 0 means the character level */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	int32 AbilityLevel;
 
+	/** 返回 PrimaryAssetId 的字符串，格式是 "ItemType: ItemName" */
 	/** Returns the logical name, equivalent to the primary asset id */
 	UFUNCTION(BlueprintCallable, Category = Item)
 	FString GetIdentifierString() const;
 
+	/** 重写这个函数使这个类型成为 Primary Asset */
 	/** Overridden to use saved type */
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 };
