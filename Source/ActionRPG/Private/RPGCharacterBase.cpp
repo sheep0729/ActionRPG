@@ -8,23 +8,27 @@
 ARPGCharacterBase::ARPGCharacterBase()
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
-	QUICK_SCOPE_CYCLE_COUNTER(STAT_ARPGCharacterBase);
+	// QUICK_SCOPE_CYCLE_COUNTER(STAT_ARPGCharacterBase);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
-	// Create ability system component, and set it to be explicitly replicated
 	// 这个 URPGAbilitySystemComponent 是继承自 UAbilitySystemComponent 的子类
+	// Create ability system component, and set it to be explicitly replicated
 	AbilitySystemComponent = CreateDefaultSubobject<URPGAbilitySystemComponent>(TEXT("AbilitySystemComponent")); // 创建 ASC
-	AbilitySystemComponent->SetIsReplicated(true); // 
+	AbilitySystemComponent->SetIsReplicated(true); // 设置复制
 
 	// 直接将 AttributeSet 作为拥有 Ability System Component 的 Actor 的 subobject 。
 	// 也可以通过 GetOrCreateAttributeSubobject 方法传递给 Ability System Component 。
 	// Create the attribute set, this replicates by default
 	AttributeSet = CreateDefaultSubobject<URPGAttributeSet>(TEXT("AttributeSet"));
 
+	// 角色的默认等级
 	CharacterLevel = 1;
 	bAbilitiesInitialized = false;
 }
 
+/**
+ * @brief 实现 IAbilitySystemInterface
+ */
 UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 {
     return AbilitySystemComponent;
@@ -35,30 +39,33 @@ UAbilitySystemComponent* ARPGCharacterBase::GetAbilitySystemComponent() const
 /*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
 /**
- * @brief 在创建 Character 或时
+ * @brief 在创建 Character 或等级改变时执行
  */
 void ARPGCharacterBase::AddStartupGameplayAbilities()
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
 	// SCOPE_CYCLE_COUNTER(STAT_AddStartupGameplayAbilities);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
-	
+
+	// 如果是 false 就终止运行，默认不在 shipping build 中运行
 	check(AbilitySystemComponent);
 
 	// 在服务器上且没有初始化
 	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
 	{
+		// 在服务器上赋予 Ability
 		// Grant abilities, but only on the server	
 		for (TSubclassOf<URPGGameplayAbility>& StartupAbility : GameplayAbilities)
 		{
 			// FGameplayAbilitySpec 是一个可激活的 Ability 的 spec 。
 			// 它内部有一个 Ability 的 CDO ，和这个 Ability 的所有实例。
-			// 激活的 / 实例化的 Ability 还需要其他的信息， FGameplayAbilitySpec 也保存了这些信息。
+			// 激活的 / 实例化的 Ability 还需要其他但不能保存在自身的信息， FGameplayAbilitySpec 也保存了这些信息。
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, GetCharacterLevel(), INDEX_NONE, this));
 		}
 
+		// 应用被动 Ability ，本项目中用来设置 AttributeSet 的初始值
 		// Now apply passives
-		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
+		for (const TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
 		{
 			// 创建一个 GameplayEffectContext 并返回 Handle 。
 			// GameplayEffectContext 是 GE 在执行期间的上下文。
@@ -75,11 +82,12 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 			{
 				// ApplyGameplayEffectSpecToTarget 最终会调用 ActiveGameplayEffects.ApplyGameplayEffectSpec()
 				// ActiveGameplayEffects 是 AbilitySystemComponent 上的一个 FActiveGameplayEffectsContainer ，它是 FActiveGameplayEffect 的容器。
-				// 返回的 FActiveGameplayEffectHandle 和上面的 Handle 不一样，它不是一个简单的 Wrapper ，而是用来在 Container 外部访问特定的 FActiveGameplayEffect 的。 
+				// 返回的 FActiveGameplayEffectHandle 和上面的 Handle 不一样，它不是一个简单的 Wrapper ，而是用来在 Container 外部访问特定的 FActiveGameplayEffect。 
 				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
 			}
 		}
 
+		// 添加来自装备的 Ability
 		AddSlottedGameplayAbilities();
 
 		bAbilitiesInitialized = true;
@@ -140,7 +148,7 @@ void ARPGCharacterBase::RefreshSlottedGameplayAbilities()
 
 void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs)
 {
-	// 先获取默认装备的能力
+	// 先获取默认装备的 Ability
 	// First add default ones
 	for (const TPair<FRPGItemSlot, TSubclassOf<URPGGameplayAbility>>& DefaultPair : DefaultSlottedAbilities)
 	{
@@ -160,17 +168,20 @@ void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbil
 		{
 			URPGItem* SlottedItem = ItemPair.Value;
 
+			// 默认使用 Character 的 Level 作为 Ability 的 Level
 			// Use the character level as default
 			int32 AbilityLevel = GetCharacterLevel();
 
 			if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
 			{
+				// 来自武器的 Ability 的 Level 保存在武器中
 				// Override the ability level to use the data from the slotted item
 				AbilityLevel = SlottedItem->AbilityLevel;
 			}
 
 			if (SlottedItem && SlottedItem->GrantedAbility)
 			{
+				// Source Object 是这个 Item
 				// This will override anything from default
 				SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
 			}
@@ -188,9 +199,11 @@ void ARPGCharacterBase::AddSlottedGameplayAbilities()
 	// const uint32 BeginTime = FPlatformTime::Cycles();
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
+	// 获得所有来自装备的 Ability
 	TMap<FRPGItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
 	FillSlottedAbilitySpecs(SlottedAbilitySpecs);
-	
+
+	// SlottedAbilitySpecs 补充到 SlottedAbilities 中
 	// Now add abilities if needed
 	for (const TPair<FRPGItemSlot, FGameplayAbilitySpec>& SpecPair : SlottedAbilitySpecs)
 	{
@@ -220,7 +233,7 @@ void ARPGCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 
 	for (TPair<FRPGItemSlot, FGameplayAbilitySpecHandle>& ExistingPair : SlottedAbilities)
 	{
-		FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(ExistingPair.Value);
+		const FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(ExistingPair.Value);
 		bool bShouldRemove = bRemoveAll || !FoundSpec;
 
 		if (!bShouldRemove)

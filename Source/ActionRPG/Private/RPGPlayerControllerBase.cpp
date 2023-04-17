@@ -6,8 +6,6 @@
 #include "RPGSaveGame.h"
 #include "Items/RPGItem.h"
 
-
-
 bool ARPGPlayerControllerBase::AddInventoryItem(URPGItem* NewItem, int32 ItemCount, int32 ItemLevel, bool bAutoSlot)
 {
 	bool bChanged = false;
@@ -180,7 +178,7 @@ bool ARPGPlayerControllerBase::GetInventoryItemData(URPGItem* Item, FRPGItemData
 	return false;
 }
 
-URPGItem* ARPGPlayerControllerBase::GetSlottedItem(FRPGItemSlot ItemSlot) const
+URPGItem* ARPGPlayerControllerBase::GetSlottedItem(const FRPGItemSlot& ItemSlot) const
 {
 	URPGItem* const* FoundItem = SlottedItems.Find(ItemSlot);
 
@@ -269,7 +267,7 @@ bool ARPGPlayerControllerBase::LoadInventory()
 	SlottedItems.Reset();
 
 	// Fill in slots from game instance
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	URPGGameInstanceBase* GameInstance = World ? World->GetGameInstance<URPGGameInstanceBase>() : nullptr;
 
 	if (!GameInstance)
@@ -292,7 +290,7 @@ bool ARPGPlayerControllerBase::LoadInventory()
 	}
 
 	URPGSaveGame* CurrentSaveGame = GameInstance->GetCurrentSaveGame();
-	URPGAssetManager& AssetManager = URPGAssetManager::Get();
+	const URPGAssetManager& AssetManager = URPGAssetManager::Get();
 	if (CurrentSaveGame)
 	{
 		// Copy from save game into controller data

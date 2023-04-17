@@ -39,7 +39,7 @@ bool URPGGameInstanceBase::IsValidItemSlot(FRPGItemSlot ItemSlot) const
 
 		if (FoundCount)
 		{
-			// TODO 这里为什么是小于？
+			// 这里是小于是因为 SlotNumber 是从 0 开始的编号
 			return ItemSlot.SlotNumber < *FoundCount;
 		}
 	}

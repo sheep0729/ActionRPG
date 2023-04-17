@@ -93,16 +93,17 @@ public:
 	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 
 protected:
+	/** 角色的等级，在角色出生后不应该直接修改 */
 	/** The level of this character, should not be modified directly once it has already spawned */
 	UPROPERTY(EditAnywhere, Replicated, Category = Abilities)
 	int32 CharacterLevel;
 
-	/** 在创建 Character 时赋予的 Ability */
+	/** 在创建 Character 时赋予的 Ability ，这些 Ability 会被 tag 或事件激活，不和输入绑定 */
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<URPGGameplayAbility>> GameplayAbilities;
 
-	/** 在创建 Character 时放到道具槽中的 Ability */
+	/** 默认装备的 Ability ，在 inventory 中的 Ability 之前添加 */
 	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<FRPGItemSlot, TSubclassOf<URPGGameplayAbility>> DefaultSlottedAbilities;
@@ -116,10 +117,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
-	/** AS 组件 The component used to handle ability system interactions */
+	/** AS 组件 */
+	/** The component used to handle ability system interactions */
 	UPROPERTY()
 	URPGAbilitySystemComponent* AbilitySystemComponent;
 
+	/** Gameplay Ability System 使用的属性集 */
 	/** List of attributes modified by the ability system */
 	UPROPERTY()
 	URPGAttributeSet* AttributeSet;
@@ -129,10 +132,12 @@ protected:
 	UPROPERTY()
 	TScriptInterface<IRPGInventoryInterface> InventorySource;
 
+	/** 记录角色的能力是否已经被初始化 */
 	/** If true we have initialized our abilities */
 	UPROPERTY()
 	int32 bAbilitiesInitialized;
 
+	/** 从 slot 到其赋予的 Ability 的映射 */
 	/** Map of slot to ability granted by that slot. I may refactor this later */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
@@ -181,6 +186,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	/** 在装备的道具改变时调用，绑定到委托或接口 */
 	/** Called when slotted items change, bound to delegate on interface */
 	void OnItemSlotChanged(FRPGItemSlot ItemSlot, URPGItem* Item);
 	void RefreshSlottedGameplayAbilities();

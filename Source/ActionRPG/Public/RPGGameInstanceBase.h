@@ -82,8 +82,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Save)
 	void SetSavingEnabled(bool bEnabled);
 
-	/** 同步加载（返回 true）或创建（返回 false）一个存档，创建的逻辑实际上是由 HandleSaveGameLoaded(USaveGame* SaveGameObject) 处理的
-	 * 没有用到，蓝图中使用的是异步加载的方式：Async Load Game From Slot */
+	/**
+	 * 同步加载（返回 true）或创建（返回 false）一个存档，创建的逻辑实际上是由 HandleSaveGameLoaded(USaveGame* SaveGameObject) 处理的
+	 * 没有用到，蓝图中使用的是异步加载的方式：Async Load Game From Slot
+	 */
 	/** Synchronously loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
 	bool LoadOrCreateSaveGame();

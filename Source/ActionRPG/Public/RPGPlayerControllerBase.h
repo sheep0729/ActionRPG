@@ -19,25 +19,46 @@ public:
 	ARPGPlayerControllerBase() {}
 	virtual void BeginPlay() override;
 
-	/** 从 item 定义到 item 数据的映射，保存 player 拥有的全部 item 。 Map of all items owned by this player, from definition to data */
+	/** 从 item 定义到 item 数据的映射，保存 player 拥有的全部 item */
+	/** Map of all items owned by this player, from definition to data */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<URPGItem*, FRPGItemData> InventoryData;
 
-	/** 从 ItemSlot 到 Item 定义的映射。 Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
+	/**
+	 * 从类型/数量到 Item 定义的映射，保存装备的道具
+	 * 在 ARPGPlayerControllerBase::LoadInventory() 由 GameInstance::ItemSlotsPerType 初始化
+	 */
+	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, URPGItem*> SlottedItems;
 
+	/** 当背包中的道具改变时的 BP 委托 */
 	/** Delegate called when an inventory item has been added or removed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnInventoryItemChanged OnInventoryItemChanged;
 
+	/** 当背包中的道具改变时的 Native 委托 */
 	/** Native version above, called before BP delegate */
 	FOnInventoryItemChangedNative OnInventoryItemChangedNative;
 
+	/** 当装备的道具改变时的 BP 委托 */
 	/** Delegate called when an inventory slot has changed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnSlottedItemChanged OnSlottedItemChanged;
 
+	/** 当装备的道具改变时的 Native 委托 */
+	/** Native version above, called before BP delegate */
+	FOnSlottedItemChangedNative OnSlottedItemChangedNative;
+
+	/** 当背包加载时的 BP 委托 */
+	/** Delegate called when the inventory has been loaded/reloaded */
+	UPROPERTY(BlueprintAssignable, Category = Inventory)
+	FOnInventoryLoaded OnInventoryLoaded;
+
+	/** 当背包加载时的 Native 委托 */
+	/** Native version above, called before BP delegate */
+	FOnInventoryLoadedNative OnInventoryLoadedNative;
+	
 	/** Called after the inventory was changed and we notified all delegates */
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
 	void InventoryItemChanged(bool bAdded, URPGItem* Item);
@@ -46,16 +67,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
 	void SlottedItemChanged(FRPGItemSlot ItemSlot, URPGItem* Item);
 
-	/** Native version above, called before BP delegate */
-	FOnSlottedItemChangedNative OnSlottedItemChangedNative;
-
-	/** Delegate called when the inventory has been loaded/reloaded */
-	UPROPERTY(BlueprintAssignable, Category = Inventory)
-	FOnInventoryLoaded OnInventoryLoaded;
-
-	/** Native version above, called before BP delegate */
-	FOnInventoryLoadedNative OnInventoryLoadedNative;
-
+	/** 向背包中添加一个新道具 */
 	/** Adds a new inventory item, will add it to an empty slot if possible. If the item supports count you can add more than one count. It will also update the level when adding if required */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool AddInventoryItem(URPGItem* NewItem, int32 ItemCount = 1, int32 ItemLevel = 1, bool bAutoSlot = true);
@@ -82,7 +94,7 @@ public:
 
 	/** Returns item in slot, or null if empty */
 	UFUNCTION(BlueprintPure, Category = Inventory)
-	URPGItem* GetSlottedItem(FRPGItemSlot ItemSlot) const;
+	URPGItem* GetSlottedItem(const FRPGItemSlot& ItemSlot) const;
 
 	/** Returns all slotted items of a given type. If none is passed as type it will return all */
 	UFUNCTION(BlueprintCallable, Category = Inventory)

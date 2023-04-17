@@ -18,6 +18,7 @@ public:
 		ItemType = URPGAssetManager::WeaponItemType;
 	}
 
+	/** 需要生成的 Weapon */
 	/** Weapon actor to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<AActor> WeaponActor;
