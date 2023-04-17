@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -6,8 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "RPGGameStateBase.generated.h"
 
-/** ±¾ÏîÄ¿µÄ GameState ±È½Ï¼òµ¥£¬ÒòÎª´ó²¿·ÖÓëµØÍ¼Ïà¹ØµÄÂß¼­¶¼·ÅÔÚÀ¶Í¼ÖĞÁË */
-/** ¸ü¸´ÔÓµÄÏîÄ¿¿ÉÄÜĞèÒªÔÚ C++ ÖĞÓĞ¶à¸ö GameState */
+/** æœ¬é¡¹ç›®çš„ GameState æ¯”è¾ƒç®€å•ï¼Œå› ä¸ºå¤§éƒ¨åˆ†ä¸åœ°å›¾ç›¸å…³çš„é€»è¾‘éƒ½æ”¾åœ¨è“å›¾ä¸­äº† */
+/** æ›´å¤æ‚çš„é¡¹ç›®å¯èƒ½éœ€è¦åœ¨ C++ ä¸­æœ‰å¤šä¸ª GameState */
 /** Base class for GameState, should be blueprinted */
 UCLASS()
 class ACTIONRPG_API ARPGGameStateBase : public AGameStateBase
