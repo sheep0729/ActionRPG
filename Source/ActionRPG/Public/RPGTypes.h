@@ -37,7 +37,7 @@ struct ACTIONRPG_API FRPGItemSlot
 		, SlotNumber(InSlotNumber)
 	{}
 
-	/** 可以放在这个 solt 中的道具的类型 */
+	/** 可以放在这个 slot 中的道具的类型 */
 	/** The type of items that can go in this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	FPrimaryAssetType ItemType;
@@ -69,6 +69,10 @@ struct ACTIONRPG_API FRPGItemSlot
 		return Hash;
 	}
 
+	/**
+	 * 判断 ItemSlot 是否有效，但不完整，完整的有效性判断需要使用 URPGGameInstanceBase::IsValidItemSlot(FRPGItemSlot ItemSlot) ，
+	 * 这个函数还会判断 SlotNumber 是否小于 ItemSlotsPerType
+	 */
 	/** Returns true if slot is valid */
 	bool IsValid() const
 	{
@@ -94,10 +98,12 @@ struct ACTIONRPG_API FRPGItemData
 		, ItemLevel(InItemLevel)
 	{}
 
+	/** 背包中道具的数量 */
 	/** The number of instances of this item in the inventory, can never be below 1 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	int32 ItemCount;
 
+	/** 道具的等级，所有实例共享 */
 	/** The level of this item. This level is shared for all instances, can never be below 1 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	int32 ItemLevel;
