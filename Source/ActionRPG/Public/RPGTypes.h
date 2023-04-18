@@ -65,7 +65,7 @@ struct ACTIONRPG_API FRPGItemSlot
 
 		// HashCombine 可以把两个 Hash 合并生成一个新 Hash ，不满足交换律
 		Hash = HashCombine(Hash, GetTypeHash(Key.ItemType));
-		Hash = HashCombine(Hash, (uint32)Key.SlotNumber);
+		Hash = HashCombine(Hash, static_cast<uint32>(Key.SlotNumber));
 		return Hash;
 	}
 

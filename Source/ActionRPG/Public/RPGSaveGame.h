@@ -53,6 +53,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FRPGItemSlot, FPrimaryAssetId> SlottedItems;
 
+	/** 标识用户的 Id ，本项目中没用到 */
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	FString UserId;
@@ -69,6 +70,6 @@ protected:
 	int32 SavedDataVersion;
 
 	/** 重写这个函数来解决旧版本保存的游戏数据 */
-	/** Overridden to allow version fixups */
+	/** Overridden to allow version fix-ups */
 	virtual void Serialize(FArchive& Ar) override;
 };
