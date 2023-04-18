@@ -7,14 +7,16 @@
 
 URPGAbilitySystemComponent::URPGAbilitySystemComponent() {}
 
-void URPGAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<URPGGameplayAbility*>& ActiveAbilities)
+void URPGAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<URPGGameplayAbility*>& ActiveAbilities) const
 {
+	// 先获得所有匹配的 FGameplayAbilitySpec ，FGameplayAbilitySpec 代表“可激活”的 Ability 。
 	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
 	GetActivatableGameplayAbilitySpecsByAllMatchingTags(GameplayTagContainer, AbilitiesToActivate, false);
 
 	// Iterate the list of all ability specs
-	for (FGameplayAbilitySpec* Spec : AbilitiesToActivate)
+	for (const FGameplayAbilitySpec* Spec : AbilitiesToActivate)
 	{
+		// FGameplayAbilitySpec 中保存的所有 AbilityInstance 代表已经激活的 Abilities ，类型是 UGameplayAbility 。
 		// Iterate all instances on this ability spec
 		TArray<UGameplayAbility*> AbilityInstances = Spec->GetAbilityInstances();
 

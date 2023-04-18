@@ -87,7 +87,7 @@ void ARPGCharacterBase::AddStartupGameplayAbilities()
 			}
 		}
 
-		// 添加来自装备的 Ability
+		// 添加已经装备的 Ability
 		AddSlottedGameplayAbilities();
 
 		bAbilitiesInitialized = true;
@@ -106,25 +106,32 @@ void ARPGCharacterBase::RemoveStartupGameplayAbilities()
 	{
 		// Remove any abilities added from a previous call
 		TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
+		// GetActivatableAbilities() 会返回 ActivatableAbilities.Items ，ActivatableAbilities 是一个 FGameplayAbilitySpecContainer
+		// 所以 FGameplayAbilitySpec 就是 “Activatable” 的 Ability 。
 		for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
 		{
-			if ((Spec.SourceObject == this) && GameplayAbilities.Contains(Spec.Ability->GetClass()))
+			// SourceObject 是指创建这个 Ability 的对象，这里通过 SourceObject 是否是自己来判断是否是 StartupGameplayAbility
+			if (Spec.SourceObject == this && GameplayAbilities.Contains(Spec.Ability->GetClass()))
 			{
 				AbilitiesToRemove.Add(Spec.Handle);
 			}
 		}
 
+		// 根据 FGameplayAbilitySpecHandle 通过 ClearAbility 来移除 Ability
 		// Do in two passes so the removal happens after we have the full list
 		for (int32 i = 0; i < AbilitiesToRemove.Num(); i++)
 		{
 			AbilitySystemComponent->ClearAbility(AbilitiesToRemove[i]);
 		}
 
+		// 移除所有的被动 GE ，这里的判断条件也是 GE 是否来自于自己
+		// 但没有使用 FActiveGameplayEffectHandle ，而是使用 FGameplayEffectQuery
 		// Remove all of the passive gameplay effects that were applied by this character
 		FGameplayEffectQuery Query;
 		Query.EffectSource = this;
 		AbilitySystemComponent->RemoveActiveEffects(Query);
 
+		// 移除已经装备的 Ability
 		RemoveSlottedGameplayAbilities(true);
 
 		bAbilitiesInitialized = false;
@@ -154,11 +161,12 @@ void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbil
 	{
 		if (DefaultPair.Value.Get())
 		{
+			// DefaultSlottedAbilities 的 SourceObject 认为是自己
 			SlottedAbilitySpecs.Add(DefaultPair.Key, FGameplayAbilitySpec(DefaultPair.Value, GetCharacterLevel(), INDEX_NONE, this));
 		}
 	}
 
-	// 再添加从 inventory 中的道具中获得的能力
+	// 再用从已经装备的道具中获得的能力覆盖
 	// Now potentially override with inventory
 	if (InventorySource)
 	{
@@ -199,7 +207,7 @@ void ARPGCharacterBase::AddSlottedGameplayAbilities()
 	// const uint32 BeginTime = FPlatformTime::Cycles();
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
-	// 获得所有来自装备的 Ability
+	// 获得所有已经装备的 Ability
 	TMap<FRPGItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
 	FillSlottedAbilitySpecs(SlottedAbilitySpecs);
 
@@ -221,15 +229,21 @@ void ARPGCharacterBase::AddSlottedGameplayAbilities()
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 }
 
-void ARPGCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
+void ARPGCharacterBase::RemoveSlottedGameplayAbilities(const bool bRemoveAll)
 {
 	TMap<FRPGItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
 
+	// 如果不需要移除全部已经装备的能力，就需要获得最新的数据来更新 SlottedAbilities
+	// 即 SlottedAbilitySpecs 代表最新的数据，SlottedAbilities 是可能过期的数据
 	if (!bRemoveAll)
 	{
+		// 获得已经装备的全部能力
 		// Fill in map so we can compare
 		FillSlottedAbilitySpecs(SlottedAbilitySpecs);
 	}
+
+	// 这里假定了实际装备的 Ability 一定存在于 SlottedAbilities 中，即 SlottedAbilities 可能会多但一定不会少
+	// 这很合理，因为这个函数是唯一会移除 SlottedAbilities 中的元素的地方
 
 	for (TPair<FRPGItemSlot, FGameplayAbilitySpecHandle>& ExistingPair : SlottedAbilities)
 	{
@@ -238,9 +252,11 @@ void ARPGCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 
 		if (!bShouldRemove)
 		{
+			// 走到这里说明 !bRemoveAll && FoundSpec ，那么就需要判断数据是否过期
 			// Need to check desired ability specs, if we got here FoundSpec is valid
 			FGameplayAbilitySpec* DesiredSpec = SlottedAbilitySpecs.Find(ExistingPair.Key);
 
+			// 最新的数据中没有 || 装备的能力不同 || 来自不同的 Item / 一个来自 Item 一个来自自己（DefaultSlottedAbilities）
 			if (!DesiredSpec || DesiredSpec->Ability != FoundSpec->Ability || DesiredSpec->SourceObject != FoundSpec->SourceObject)
 			{
 				bShouldRemove = true;
@@ -375,13 +391,13 @@ bool ARPGCharacterBase::SetCharacterLevel(int32 NewLevel)
 	return false;
 }
 
-bool ARPGCharacterBase::ActivateAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, bool bAllowRemoteActivation)
+bool ARPGCharacterBase::ActivateAbilitiesWithItemSlot(const FRPGItemSlot& ItemSlot, const bool bAllowRemoteActivation)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
 	// SCOPE_LOG_TIME_FUNC();
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
-	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
+	const FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
 
 	if (FoundHandle && AbilitySystemComponent)
 	{
@@ -391,18 +407,18 @@ bool ARPGCharacterBase::ActivateAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, boo
 	return false;
 }
 
-void ARPGCharacterBase::GetActiveAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, TArray<URPGGameplayAbility*>& ActiveAbilities)
+void ARPGCharacterBase::GetActiveAbilitiesWithItemSlot(const FRPGItemSlot& ItemSlot, TArray<URPGGameplayAbility*>& ActiveAbilities)
 {
 	/*---------------------------------------------------------- STAT BEGIN --------------------------------------------------------------*/
 	// static FTotalTimeAndCount GetActiveAbilitiesWithItemSlotTime;
 	// SCOPE_LOG_TIME_FUNC_WITH_GLOBAL(&GetActiveAbilitiesWithItemSlotTime);
 	/*----------------------------------------------------------- STAT END ---------------------------------------------------------------*/
 
-	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
+	const FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
 
 	if (FoundHandle && AbilitySystemComponent)
 	{
-		FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(*FoundHandle);
+		const FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(*FoundHandle);
 
 		if (FoundSpec)
 		{
@@ -411,6 +427,7 @@ void ARPGCharacterBase::GetActiveAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, TA
 			// Find all ability instances executed from this slot
 			for (UGameplayAbility* ActiveAbility : AbilityInstances)
 			{
+				// IMPORTANT 这说明 FGameplayAbilitySpec 中保存的所有 AbilityInstance 就是 ActiveAbilities ，类型是 UGameplayAbility
 				ActiveAbilities.Add(Cast<URPGGameplayAbility>(ActiveAbility));
 			}
 		}

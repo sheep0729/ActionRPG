@@ -32,9 +32,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// 实现 IAbilitySystemInterface
-	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	/*------------------------------------------------------ 属性 Getter ---------------------------------------------------*/
+	/*---------------------------------------------------  Getters ---------------------------------------------------*/
 
 	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
@@ -60,22 +60,33 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual int32 GetCharacterLevel() const;
 
+	/*----------------------------------------------------------------------------------------------------------------*/
+
+	/** 设置角色的等级，可能会重新添加 */
 	/** Modifies the character level, this may change abilities. Returns true on success */
 	UFUNCTION(BlueprintCallable)
 	virtual bool SetCharacterLevel(int32 NewLevel);
 
+	/**
+	 * 激活 Slot 中的能力，返回 true 不代表一定能激活成功
+	 * bAllowRemoteActivation 代表是否在远程激活
+	 */
 	/**
 	 * Attempts to activate any ability in the specified item slot. Will return false if no activatable ability found or activation fails
 	 * Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
 	 * If bAllowRemoteActivation is true, it will remotely activate local/server abilities, if false it will only try to locally activate the ability
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	bool ActivateAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, bool bAllowRemoteActivation = true);
+	bool ActivateAbilitiesWithItemSlot(const FRPGItemSlot& ItemSlot, bool bAllowRemoteActivation = true);
 
+	/** 获得某个 ItemSlot 上已经激活的 Ability ，bAllowRemoteActivation 代表是否在远程激活 */
 	/** Returns a list of active abilities bound to the item slot. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	void GetActiveAbilitiesWithItemSlot(FRPGItemSlot ItemSlot, TArray<URPGGameplayAbility*>& ActiveAbilities);
+	void GetActiveAbilitiesWithItemSlot(const FRPGItemSlot& ItemSlot, TArray<URPGGameplayAbility*>& ActiveAbilities);
 
+	/**
+	 * 激活全部拥有指定 Tags 的 Ability ，bAllowRemoteActivation 代表是否在远程激活
+	 */
 	/**
 	 * Attempts to activate all abilities that match the specified tags
 	 * Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
@@ -84,10 +95,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbilitiesWithTags(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true);
 
+	/** 获得具有全部指定 Tags 且已经激活的全部 Ability */
 	/** Returns a list of active abilities matching the specified tags. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<URPGGameplayAbility*>& ActiveAbilities);
 
+	/** 英文注释有误，不是 total ，而是在所有拥有 CooldownTags 中的任何一个 Tag 的 Ability 中找到剩余冷却时间最长的一个返回 */
 	/** Returns total time and remaining time for cooldown tags. Returns false if no active cooldowns found */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
@@ -103,7 +116,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<URPGGameplayAbility>> GameplayAbilities;
 
-	/** 默认装备的 Ability ，在 inventory 中的 Ability 之前添加 */
+	/** 默认装备的 Ability ，在背包中的 Ability 添加之前添加 */
 	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<FRPGItemSlot, TSubclassOf<URPGGameplayAbility>> DefaultSlottedAbilities;
@@ -137,7 +150,7 @@ protected:
 	UPROPERTY()
 	int32 bAbilitiesInitialized;
 
-	/** 从 slot 到其赋予的 Ability 的映射 */
+	/** 从 slot 到 Ability 的映射 */
 	/** Map of slot to ability granted by that slot. I may refactor this later */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
@@ -191,31 +204,38 @@ protected:
 	void OnItemSlotChanged(FRPGItemSlot ItemSlot, URPGItem* Item);
 	void RefreshSlottedGameplayAbilities();
 
+	/** 应用开始时的 GA 和 GE */
 	/** Apply the startup gameplay abilities and effects */
 	void AddStartupGameplayAbilities();
 
+	/** 移除开始时的 GA 和 GE */
 	/** Attempts to remove any startup gameplay abilities */
 	void RemoveStartupGameplayAbilities();
 
+	/** 添加已经装备的 GA */
 	/** Adds slotted item abilities if needed */
 	void AddSlottedGameplayAbilities();
 
-	/** 获取来自装备的 Ability ，放到 SlottedAbilitySpecs 中 */
+	/** 获取来自道具的 Ability ，放到 SlottedAbilitySpecs 中 */
 	/** Fills in with ability specs, based on defaults and inventory */
 	void FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs);
 
+	/** 移除已经装备的 Ability */
 	/** Remove slotted gameplay abilities, if force is false it only removes invalid ones */
 	void RemoveSlottedGameplayAbilities(bool bRemoveAll);
 
+	// 这些 Handle 函数会调用对应的 On 函数，而 On 函数是在蓝图中实现的
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ARPGCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	/** AIPerceptionSystem 需要使用这个函数 */
 	/** Required to support AIPerceptionSystem */
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
+	// 上面 URPGAttributeSet 要用到的 Handle 函数是 protected 的，所以要把 URPGAttributeSet 声明为 Character 的友元类
 	// Friended to allow access to handle functions above
 	friend URPGAttributeSet;
 };
