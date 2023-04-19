@@ -154,7 +154,7 @@ protected:
 	/** Map of slot to ability granted by that slot. I may refactor this later */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FRPGItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
-
+	
 	/** Delegate handles */
 	FDelegateHandle InventoryUpdateHandle;
 	FDelegateHandle InventoryLoadedHandle;

@@ -287,6 +287,7 @@ void ARPGCharacterBase::PossessedBy(AController* NewController)
 
 		Super::PossessedBy(NewController);
 
+		// 设置 Inventory Source ，对于 AIController 会失败，因为没有实现 IRPGInventoryInterface
 		// Try setting the inventory source, this will fail for AI
 		InventorySource = NewController;
 
@@ -316,7 +317,9 @@ void ARPGCharacterBase::UnPossessed()
 	// Unmap from inventory source
 	if (InventorySource && InventoryUpdateHandle.IsValid())
 	{
+		/** Removes a delegate instance from this multi-cast delegate's invocation list (performance is O(N)) */
 		InventorySource->GetSlottedItemChangedDelegate().Remove(InventoryUpdateHandle);
+		/** Clear handle to indicate it is no longer bound */
 		InventoryUpdateHandle.Reset();
 
 		InventorySource->GetInventoryLoadedDelegate().Remove(InventoryLoadedHandle);
@@ -326,6 +329,9 @@ void ARPGCharacterBase::UnPossessed()
 	InventorySource = nullptr;
 }
 
+/**
+ * @brief 在 APawn 中声明的 Controller 属性设置了这个 RepNotify
+ */
 void ARPGCharacterBase::OnRep_Controller()
 {
 	Super::OnRep_Controller();
@@ -472,6 +478,7 @@ bool ARPGCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer Cooldow
 			float LongestTime = DurationAndTimeRemaining[0].Key;
 			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
 			{
+				// 找到最长的剩余 CD 时间
 				if (DurationAndTimeRemaining[Idx].Key > LongestTime)
 				{
 					LongestTime = DurationAndTimeRemaining[Idx].Key;

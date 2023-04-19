@@ -25,10 +25,16 @@ public:
 	// Constructor and overrides
 	URPGGameplayAbility();
 
+	/** 从 Gameplay Tags 到 Gameplay Effect Container 的映射 */
 	/** Map of gameplay tags to gameplay effect containers */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameplayEffects)
 	TMap<FGameplayTag, FRPGGameplayEffectContainer> EffectContainerMap;
 
+	
+	/**
+	 * FGameplayEventData: Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
+	 * AutoCreateRefTerm: 如列出参数（由引用传递）的引脚未连接，其将拥有一个自动创建的默认项。这是蓝图的一个便利功能，经常在数组引脚上使用。
+	 */
 	/** Make gameplay effect container spec to be applied later, using the passed in container */
 	UFUNCTION(BlueprintCallable, Category = Ability, meta=(AutoCreateRefTerm = "EventData"))
 	virtual FRPGGameplayEffectContainerSpec MakeEffectContainerSpecFromContainer(const FRPGGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);

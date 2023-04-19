@@ -48,20 +48,45 @@ struct FRPGGameplayEffectContainerSpec
 public:
 	FRPGGameplayEffectContainerSpec() {}
 
+
+	/**
+	 * FGameplayAbilityTargetDataHandle:
+	 * 
+	 *	Handle for Targeting Data. This servers two main purposes:
+	 *		-Avoid us having to copy around the full targeting data structure in Blueprints
+	 *		-Allows us to leverage polymorphism in the target data structure
+	 *		-Allows us to implement NetSerialize and replicate by value between clients/server
+	 *
+	 *		-Avoid using UObjects could be used to give us polymorphism and by reference passing in blueprints.
+	 *		-However we would still be screwed when it came to replication
+	 *
+	 *		-Replication by value
+	 *		-Pass by reference in blueprints
+	 *		-Polymorphism in TargetData structure
+	 */
 	/** Computed target data */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
 	FGameplayAbilityTargetDataHandle TargetData;
 
+	/**
+	 * 没用到
+	 *
+	 * FGameplayEffectSpecHandle:
+	 *
+	 * Allows blueprints to generate a GameplayEffectSpec once and then reference it by handle, to apply it multiple times/multiple targets.
+	 */
 	/** List of gameplay effects to apply to the targets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
 	TArray<FGameplayEffectSpecHandle> TargetGameplayEffectSpecs;
 
+	/** 没用到 */
 	/** Returns true if this has any valid effect specs */
 	bool HasValidEffects() const;
 
 	/** Returns true if this has any valid targets */
 	bool HasValidTargets() const;
 
+	/** 把新的 Target 添加到 TargetData */
 	/** Adds new targets to target data */
 	void AddTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
 };

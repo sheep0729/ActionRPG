@@ -13,7 +13,7 @@ FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpecFrom
 	FRPGGameplayEffectContainerSpec ReturnSpec;
 	AActor* OwningActor = GetOwningActorFromActorInfo();
 	ARPGCharacterBase* OwningCharacter = Cast<ARPGCharacterBase>(OwningActor);
-	URPGAbilitySystemComponent* OwningASC = URPGAbilitySystemComponent::GetAbilitySystemComponentFromActor(OwningActor);
+	const URPGAbilitySystemComponent* OwningASC = URPGAbilitySystemComponent::GetAbilitySystemComponentFromActor(OwningActor);
 
 	if (OwningASC)
 	{
@@ -45,7 +45,7 @@ FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpecFrom
 
 FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpec(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
-	FRPGGameplayEffectContainer* FoundContainer = EffectContainerMap.Find(ContainerTag);
+	const FRPGGameplayEffectContainer* FoundContainer = EffectContainerMap.Find(ContainerTag);
 
 	if (FoundContainer)
 	{
@@ -61,13 +61,14 @@ TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainerSpe
 	// Iterate list of effect specs and apply them to their target data
 	for (const FGameplayEffectSpecHandle& SpecHandle : ContainerSpec.TargetGameplayEffectSpecs)
 	{
+		/** K2_ApplyGameplayEffectSpecToTarget: Apply a previously created gameplay effect spec to a target */
 		AllEffects.Append(K2_ApplyGameplayEffectSpecToTarget(SpecHandle, ContainerSpec.TargetData));
 	}
 	return AllEffects;
 }
 
-TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainer(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
+TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainer(const FGameplayTag ContainerTag, const FGameplayEventData& EventData, const int32 OverrideGameplayLevel)
 {
-	FRPGGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
+	const FRPGGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
 	return ApplyEffectContainerSpec(Spec);
 }

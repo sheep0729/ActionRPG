@@ -30,6 +30,7 @@ public:
 	/** Returns a list of currently active ability instances that match the tags */
 	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<URPGGameplayAbility*>& ActiveAbilities) const;
 
+	/** Ability 的默认等级是角色的等级 */
 	/** Returns the default level used for ability activations, derived from the character */
 	int32 GetDefaultAbilityLevel() const;
 

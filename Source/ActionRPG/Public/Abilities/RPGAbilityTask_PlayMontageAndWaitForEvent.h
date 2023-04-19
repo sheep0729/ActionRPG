@@ -100,7 +100,7 @@ private:
 	bool bStopWhenAbilityEnds;
 
 	/** Checks if the ability is playing a montage and stops that montage, returns true if a montage was stopped, false if not. */
-	bool StopPlayingMontage();
+	bool StopPlayingMontage() const;
 
 	/** Returns our ability system component */
 	URPGAbilitySystemComponent* GetTargetASC();

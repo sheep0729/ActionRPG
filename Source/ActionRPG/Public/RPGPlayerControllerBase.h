@@ -46,7 +46,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnSlottedItemChanged OnSlottedItemChanged;
 
-	/** 当装备的道具改变时的 Native 委托，本项目中没有绑定回调 */
+	/** 当装备的道具改变时的 Native 委托，在 ARPGCharacterBase::OnPossess 中绑定了 ARPGCharacterBase::OnItemSlotChanged */
 	/** Native version above, called before BP delegate */
 	FOnSlottedItemChangedNative OnSlottedItemChangedNative;
 
@@ -55,7 +55,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnInventoryLoaded OnInventoryLoaded;
 
-	/** 当背包加载时的 Native 委托，本项目中没有绑定回调 */
+	/** 当背包加载时的 Native 委托，在 ARPGCharacterBase::OnPossess 中绑定了 ARPGCharacterBase::RefreshSlottedGameplayAbilities */
 	/** Native version above, called before BP delegate */
 	FOnInventoryLoadedNative OnInventoryLoadedNative;
 

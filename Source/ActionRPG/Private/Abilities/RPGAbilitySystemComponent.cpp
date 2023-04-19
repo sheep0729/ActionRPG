@@ -40,5 +40,7 @@ int32 URPGAbilitySystemComponent::GetDefaultAbilityLevel() const
 
 URPGAbilitySystemComponent* URPGAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent)
 {
+	// 具有 AbilitySystemComponent 的 Actor 应该实现了 IAbilitySystemInterface ，可以直接通过 GetAbilitySystemComponent() 获取
+	// LookForComponent 不建议使用，因为会用 FindComponentByClass<UAbilitySystemComponent>() 查找，速度很慢
 	return Cast<URPGAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
 }

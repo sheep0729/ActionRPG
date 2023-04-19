@@ -40,8 +40,8 @@ URPGDamageExecution::URPGDamageExecution()
 
 void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
-	UAbilitySystemComponent* SourceAbilitySystemComponent = ExecutionParams.GetSourceAbilitySystemComponent();
+	const UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
+	const UAbilitySystemComponent* SourceAbilitySystemComponent = ExecutionParams.GetSourceAbilitySystemComponent();
 
 	AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->GetAvatarActor_Direct() : nullptr;
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetAvatarActor_Direct() : nullptr;
@@ -52,6 +52,8 @@ void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
 
+	/** 里面有各种各样的 Tag */
+	/** Data that is used in aggregator evaluation that is passed from the caller/game code */
 	FAggregatorEvaluateParameters EvaluationParameters;
 	EvaluationParameters.SourceTags = SourceTags;
 	EvaluationParameters.TargetTags = TargetTags;
@@ -62,6 +64,17 @@ void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	// --------------------------------------
 
 	float DefensePower = 0.f;
+	
+	/**
+	 * Attempts to calculate the magnitude of a captured attribute given the specified parameters. Can fail if the gameplay spec doesn't have
+	 * a valid capture for the attribute.
+	 * 
+	 * @param InCaptureDef	Attribute definition to attempt to calculate the magnitude of
+	 * @param InEvalParams	Parameters to evaluate the attribute under
+	 * @param OutMagnitude	[OUT] Computed magnitude
+	 * 
+	 * @return True if the magnitude was successfully calculated, false if it was not
+	 */
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefensePowerDef, EvaluationParameters, DefensePower);
 	if (DefensePower == 0.0f)
 	{
@@ -74,7 +87,7 @@ void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	float Damage = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
 
-	float DamageDone = Damage * AttackPower / DefensePower;
+	const float DamageDone = Damage * AttackPower / DefensePower;
 	if (DamageDone > 0.f)
 	{
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));

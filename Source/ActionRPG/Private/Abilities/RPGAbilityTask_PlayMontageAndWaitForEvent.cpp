@@ -209,7 +209,7 @@ void URPGAbilityTask_PlayMontageAndWaitForEvent::OnDestroy(bool AbilityEnded)
 
 }
 
-bool URPGAbilityTask_PlayMontageAndWaitForEvent::StopPlayingMontage()
+bool URPGAbilityTask_PlayMontageAndWaitForEvent::StopPlayingMontage() const
 {
 	const FGameplayAbilityActorInfo* ActorInfo = Ability->GetCurrentActorInfo();
 	if (!ActorInfo)
@@ -217,7 +217,7 @@ bool URPGAbilityTask_PlayMontageAndWaitForEvent::StopPlayingMontage()
 		return false;
 	}
 
-	UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
+	const UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
 	if (AnimInstance == nullptr)
 	{
 		return false;
@@ -248,11 +248,11 @@ bool URPGAbilityTask_PlayMontageAndWaitForEvent::StopPlayingMontage()
 
 FString URPGAbilityTask_PlayMontageAndWaitForEvent::GetDebugString() const
 {
-	UAnimMontage* PlayingMontage = nullptr;
+	const UAnimMontage* PlayingMontage = nullptr;
 	if (Ability)
 	{
 		const FGameplayAbilityActorInfo* ActorInfo = Ability->GetCurrentActorInfo();
-		UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
+		const UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
 
 		if (AnimInstance != nullptr)
 		{
