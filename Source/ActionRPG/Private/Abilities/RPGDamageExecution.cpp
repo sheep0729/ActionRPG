@@ -20,6 +20,10 @@ struct RPGDamageStatics
 		// the projectile was launched, not when it hits).
 		DEFINE_ATTRIBUTE_CAPTUREDEF(URPGAttributeSet, AttackPower, Source, true);
 
+		// 这个宏定义了两个变量：
+		// DamageProperty ：AttributeSet 中的属性
+		// DamageDef ：捕获的副本
+		// GE_DamageBase 中有一个 Calculation Modifier 修改了 DamageDef ，相当于设置了攻击的伤害
 		// Also capture the source's raw Damage, which is normally passed in directly via the execution
 		DEFINE_ATTRIBUTE_CAPTUREDEF(URPGAttributeSet, Damage, Source, true);
 	}
@@ -38,6 +42,11 @@ URPGDamageExecution::URPGDamageExecution()
 	RelevantAttributesToCapture.Add(DamageStatics().DamageDef);
 }
 
+/**
+ * @brief 
+ * @param ExecutionParams Struct representing parameters for a custom gameplay effect execution. Should not be held onto via reference, used just for the scope of the execution
+ * @param OutExecutionOutput Struct representing the output of a custom gameplay effect execution.
+ */
 void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	const UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
@@ -90,6 +99,17 @@ void URPGDamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	const float DamageDone = Damage * AttackPower / DefensePower;
 	if (DamageDone > 0.f)
 	{
+		/**
+		 * Calculation Modifier 本来是临时修改捕获的属性，但这里在执行完计算公式后直接写入了 DamageProperty ，是永久修改。
+		 * 
+		 * FGameplayModifierEvaluatedData
+		 *
+		 * Data that describes what happened in an attribute modification. This is passed to ability set callbacks
+		 *
+		 * AddOutputModifier
+		 * 
+		 * Add the specified evaluated data to the execution's output modifiers
+		 */
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 	}
 }
