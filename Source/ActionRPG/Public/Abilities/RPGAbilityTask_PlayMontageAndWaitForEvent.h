@@ -100,15 +100,15 @@ private:
 	bool bStopWhenAbilityEnds;
 
 	/** Checks if the ability is playing a montage and stops that montage, returns true if a montage was stopped, false if not. */
-	bool StopPlayingMontage() const;
+	bool StopPlayingMontage();
 
 	/** Returns our ability system component */
-	URPGAbilitySystemComponent* GetTargetASC();
+	URPGAbilitySystemComponent* GetTargetASC() const;
 
-	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted) const;
 	void OnAbilityCancelled();
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	void OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData* Payload);
+	void OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData* Payload) const;
 
 	FOnMontageBlendingOutStarted BlendingOutDelegate;
 	FOnMontageEnded MontageEndedDelegate;

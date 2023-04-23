@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.27",
+	"EngineAssociation": "5.1",
 	"Category": "Samples",
 	"Description": "",
 	"Modules": [
@@ -117,10 +117,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "SlateRemote",
-			"Enabled": true
-		},
-		{
 			"Name": "MagicLeapEmulator",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
@@ -163,21 +159,13 @@
 		{
 			"Name": "ChaosEditor",
 			"Enabled": false
-		},
-		{
-			"Name": "VisualStudioTools",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/362651520df94e4fa65492dbcba44ae2",
-			"SupportedTargetPlatforms": [
-				"Win64"
-			]
 		}
 	],
 	"TargetPlatforms": [
 		"Android",
 		"IOS",
-		"WindowsNoEditor",
-		"MacNoEditor"
+		"Win64",
+		"Mac"
 	],
 	"EpicSampleNameHash": "2961006109"
 }
