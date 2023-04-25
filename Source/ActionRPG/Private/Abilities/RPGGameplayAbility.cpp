@@ -17,6 +17,7 @@ FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpecFrom
 
 	if (OwningASC)
 	{
+		// TODO 什么意思？
 		// If we have a target type, run the targeting logic. This is optional, targets can be added later
 		if (Container.TargetType.Get())
 		{
@@ -47,9 +48,7 @@ FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpecFrom
 FRPGGameplayEffectContainerSpec URPGGameplayAbility::MakeEffectContainerSpec(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	// 查找是否有 Tag 对应的 GameplayEffectContainer
-	const FRPGGameplayEffectContainer* FoundContainer = EffectContainerMap.Find(ContainerTag);
-
-	if (FoundContainer)
+	if (const FRPGGameplayEffectContainer* FoundContainer = EffectContainerMap.Find(ContainerTag))
 	{
 		// 根据 GameplayEffectContainer 创建 GameplayEffectContainerSpec
 		return MakeEffectContainerSpecFromContainer(*FoundContainer, EventData, OverrideGameplayLevel);
@@ -61,9 +60,12 @@ TArray<FActiveGameplayEffectHandle> URPGGameplayAbility::ApplyEffectContainerSpe
 {
 	TArray<FActiveGameplayEffectHandle> AllEffects;
 
+	// 遍历列表中的全部 GE Spec 并把他们应用到 TargetData 上
 	// Iterate list of effect specs and apply them to their target data
 	for (const FGameplayEffectSpecHandle& SpecHandle : ContainerSpec.TargetGameplayEffectSpecs)
 	{
+		// will do the actual damage to the target
+		/** K2_ApplyGameplayEffectSpecToTarget: 把之前创建的 GE Spec 应用到 Target 上 */
 		/** K2_ApplyGameplayEffectSpecToTarget: Apply a previously created gameplay effect spec to a target */
 		AllEffects.Append(K2_ApplyGameplayEffectSpecToTarget(SpecHandle, ContainerSpec.TargetData));
 	}
