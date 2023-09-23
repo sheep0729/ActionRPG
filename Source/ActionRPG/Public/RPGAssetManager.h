@@ -72,4 +72,9 @@ public:
      * @param bLogWarning If true, this will log a warning if the item failed to load
      */
     URPGItem* ForceLoadItem(const FPrimaryAssetId& PrimaryAssetId, bool bLogWarning = true) const;
+
+    UFUNCTION(BlueprintCallable)
+    static void AssetManagerSample();
+
+    void CallbackFunction(FPrimaryAssetId WeaponId);
 };

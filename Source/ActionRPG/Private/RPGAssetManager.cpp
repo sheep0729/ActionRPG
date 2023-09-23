@@ -3,6 +3,8 @@
 #include "RPGAssetManager.h"
 #include "Items/RPGItem.h"
 #include "AbilitySystemGlobals.h"
+#include "AssetRegistry/AssetData.h"
+#include "Items/RPGWeaponItem.h"
 
 const FPrimaryAssetType	URPGAssetManager::PotionItemType = TEXT("Potion");
 const FPrimaryAssetType	URPGAssetManager::SkillItemType = TEXT("Skill");
@@ -51,4 +53,53 @@ URPGItem* URPGAssetManager::ForceLoadItem(const FPrimaryAssetId& PrimaryAssetId,
 	}
 
 	return LoadedItem;
+}
+
+void URPGAssetManager::AssetManagerSample()
+{
+	// Get the global Asset Manager 获取资产管理器
+	URPGAssetManager& AssetManager = URPGAssetManager::Get();
+
+	// Get a list of all weapons that can be loaded 获取所有可以加载的武器
+	TArray<FPrimaryAssetId> WeaponIdList;
+	AssetManager.GetPrimaryAssetIdList(WeaponItemType, WeaponIdList);
+
+	for (const FPrimaryAssetId& WeaponId : WeaponIdList)
+	{
+		// Get tag / value for an unloaded weapon 获取资产中的数据
+		FAssetData AssetDataToParse;
+		AssetManager.GetPrimaryAssetData(WeaponId, AssetDataToParse);
+
+		FName QueryExample;
+		AssetDataToParse.GetTagValue(GET_MEMBER_NAME_CHECKED(URPGItem, ExampleRegistryTag), QueryExample);
+
+		UE_LOG(LogTemp, Log, TEXT("Read ExampleRegistryTag %s from Weapon %s"), *QueryExample.ToString(), *AssetDataToParse.AssetName.ToString());
+	}
+
+	// Permanently load a single item
+	TArray<FName> CurrentLoadState;
+	CurrentLoadState.Add(FName("Game"));
+
+	FName WeaponName = FName("Weapon_Hammer_3");
+	FPrimaryAssetId WeaponId = FPrimaryAssetId(WeaponItemType, WeaponName);
+	AssetManager.LoadPrimaryAsset(WeaponId, CurrentLoadState, FStreamableDelegate::CreateUObject(&AssetManager, &URPGAssetManager::CallbackFunction, WeaponId));
+
+	TArray<FPrimaryAssetId> ListOfPrimaryAssetIds;
+	AssetManager.GetPrimaryAssetIdList(SkillItemType, ListOfPrimaryAssetIds);
+
+	// Load a list of items as long as Handle is alive
+	TSharedPtr<FStreamableHandle> Handle = AssetManager.PreloadPrimaryAssets(ListOfPrimaryAssetIds, CurrentLoadState, false);
+
+	// Should store Handle somewhere
+}
+
+void URPGAssetManager::CallbackFunction(FPrimaryAssetId WeaponId)
+{
+	if (const URPGWeaponItem* Weapon = GetPrimaryAssetObject<URPGWeaponItem>(WeaponId))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Loaded Weapon %s"), *Weapon->GetName());
+	}
+
+	// Release Previously loaded item
+	UnloadPrimaryAsset(WeaponId);
 }

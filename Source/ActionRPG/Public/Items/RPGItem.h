@@ -84,6 +84,24 @@ public:
 	/** 重写这个函数使这个类型成为 Primary Asset */
 	/** Overridden to use saved type */
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+
+	// ASSET MANAGER EXAMPLE: Detailed preview texture for inventory menu
+	// AssetBundles: [PropertyMetadata] Used for SoftObjectPtr/SoftObjectPath properties. Comma separated list of Bundle names used inside
+	// PrimaryDataAssets to specify which bundles this reference is part of
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item, meta = (AssetBundles = "Menu"))
+	TSoftObjectPtr<UTexture> InventoryTexture;
+
+	// ASSET MANAGER EXAMPLE: Sound that only plays in game
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item, meta = (AssetBundles = "Game"))
+	TSoftObjectPtr<USoundBase> PickupSound;
+
+	// ASSET MANAGER EXAMPLE: Item that is linked to this one somehow
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	FPrimaryAssetId LinkedItem;
+ 
+	// ASSET MANAGER EXAMPLE: Item that is linked to this one somehow
+	// AssetRegistrySearchable: The AssetRegistrySearchable Specifier indicates that this property and its value will be automatically added to
+	// the Asset Registry for any Asset class instances containing this as a member variable. It is not legal to use on struct properties or parameters.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item, AssetRegistrySearchable)
+	FName ExampleRegistryTag;
 };
-
-
